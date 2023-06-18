@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KNOWLEDGE CAFE RUST LANG</title>
+    <style>
+        .main {
+            display: flex;
+            flex-direction: row;
+            max-height: 100vh;
+            gap: 20px;
+        }
+        .controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .stats {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <div class="controls">
+
+    </div>
+    <div class="stats">
+        <details class="response">
+            <summary class="question"> What is the name </summary>
+            <div class="answers">
+                <h5> <span style="color:blue"> 53% </span> asff fggsfg ssdfsd </h5>
+                <h5> <span style="color:blue"> 33% </span> ojpfgj ssdfsd 8et93sd </h5>
+                <h5> <span style="color:blue"> 13% </span> saffadsfs sf ssdfsd </h5>
+            </div>
+        </details>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+    const questions = [
+        {
+            question: "I am someone who only pays attention to AI, Chat GPT and LLMs",
+            options: [
+                "Yes",
+                "No, I am actually interested in teaching myself things, it's not " +
+                "optimal to always teach an LLM :) "
+            ]
+        },
+        {
+            question: "Rust lang to me is 🦀 ...",
+            options: [
+                "completely new ...never heard of it !",
+                "fairly new ... have compiled a simple rust program before",
+                "actively building things in Rust ! (know the fundamentals)",
+            ]
+        },
+        {
+            question: "My most comfortable language atm is ... ",
+            options: [
+                "Typescript",
+                "Golang",
+                "Java",
+                "Python",
+                "Other",
+                "Not actively involved....but I am familiar with programming concepts",
+                "Never programmed before, but would still like to get something out of this session",
+            ]
+        },
+        {
+            question: "Today I'd like to ... ",
+            options: [
+                "write simple rust programs to learn fundamentals (No installations required) !",
+                "fight the borrow checker",
+                "have theoretical discussions about plausible benefits of using rust",
+            ]
+        },
+        {
+            question: "TERMS AND CONDITIONS :- This presentation is not endorsed or " +
+                "sponsored by The Rust Foundation. It's created solely by Tilak. Please rely on the " +
+                "official docs for true understanding.",
+            options: [ "Agree"]
+        },
+        {
+            question: "After the session I feel like I want to ",
+            options: [
+                "start building stuff in Rust",
+                "never look at Rust again",
+                "get my time back for < insert reason >."
+            ]
+        }
+    ];
+
+    const responses = {};
+    const stats = document.querySelector(".stats");
+    const controls = document.querySelector(".controls");
+
+    let hideButton = document.createElement("button");
+    hideButton.dataset.intent = "hide";
+    hideButton.innerHTML = "Hide";
+    controls.insertAdjacentElement('beforeend', hideButton);
+
+    for (let i = 0; i < questions.length; ++i) {
+        let showButton = document.createElement("button");
+        showButton.dataset.intent = "show";
+        showButton.dataset.id = i.toString();
+        showButton.innerHTML = `Send Q${i}`;
+        showButton.title = questions[i].question;
+        controls.insertAdjacentElement('beforeend', showButton);
+    }
+
+    var socket = io();
+
+    controls.addEventListener('click', e => {
+        if(e.target.dataset.intent === "hide") {
+            socket.emit("ORG HIDE");
+        } else {
+            socket.emit("")
+            const qid = e.target.dataset.id;
+            const questionData = {
+                id: qid,
+                question: questions[qid].question,
+                options: questions[qid].options
+            };
+            socket.emit("ORG SHOW", questionData);
+        }
+    });
+
+    socket.on('NODE ANS', (data) => {
+        const user = data.user
+        const questionNumber = data.questionNumber;
+        const answer = data.answer;
+        if (!(questionNumber in responses)) {
+            responses[questionNumber] = {}
+        }
+        console.log(questionNumber, user, answer);
+        responses[questionNumber][user] = answer;
+        console.log(responses);
+        recalculateStatsAndUpdateUI();
+    });
+
+    socket.on('ONLINE', (numberOfOnlineUsers) => {
+        console.log(numberOfOnlineUsers);
+    })
+
+    function recalculateStatsAndUpdateUI() {
+        const temp = {}
+        for (let questKey in responses) {
+            const idx = Number(questKey);
+            const freq = {}
+            const totalResponses = Object.keys(responses[idx]).length;
+            for (let user in responses[questKey]) {
+                const chosen = responses[questKey][user];
+                if (!(chosen in freq))
+                    freq[chosen] = 1
+                else
+                    freq[chosen]++;
+            }
+            temp[questKey] = { freq, totalResponses }
+        }
+        stats.innerHTML = createDetails(temp);
+    }
+
+    function createDetails(responses) {
+
+        let template = ``;
+
+        for (let key in responses) {
+
+            const idx = Number(key);
+            const freq = responses[key].freq;
+            const total = responses[key].totalResponses;
+
+            let divs = ``;
+
+            for (let ans in freq) {
+                const count = freq[ans];
+                const percent = count * 100 / total;
+                divs += `<h5>
+                    <span style="color:blue"> ${percent.toFixed(2)}% </span>
+                    <span style="color:olivedrab"> ${count} / ${total} </span>
+                    ${ans}
+                </h5>`;
+            }
+
+            template += `<details class="response" open>
+                <summary class="question"> ${questions[idx].question} </summary>
+                <div class="answers">
+                    ${divs}
+                </div>
+            </details>`;
+
+        }
+
+        return template;
+    }
+
+    recalculateStatsAndUpdateUI();
+</script>
+</body>
+</html>
