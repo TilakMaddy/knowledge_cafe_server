@@ -1,0 +1,86 @@
+.main {
+    display: flex;
+    flex-direction: row;
+    max-height: 100vh;
+    gap: 20px;
+}
+.controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.stats {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+
+/*modal button*/
+
+.ask-quest {
+    margin: 1rem;
+    padding: 0.2rem;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.o-hero {
+    /* border: 2px solid black; */
+    width: 70%;
+    max-width: 800px;
+    background-color: whitesmoke;
+    padding: 2rem;
+}
+
+.o-hero form {
+    /* border: 2px solid green; */
+}
+
+.row {
+    /* border: 2px solid red; */
+    display: flex;
+    gap: 2rem;
+    justify-content: space-around;
+    align-items: center;
+}
+
+
+.o-hero .add-q-btn {
+    flex: 1;
+}
+
+#a-q-l {
+    flex: 1;
+}
+
+#a-q-i {
+    flex: 7;
+}
+.row.options {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+
+.row.options input {
+    width: 70%;
+}
+
+.hidden {
+    visibility: hidden;
+}
