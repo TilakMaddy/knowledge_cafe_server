@@ -10,9 +10,11 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-app.get('/', (req,res) => {
-  res.sendFile(__dirname + '/index.html')
-})
+// app.get('/', (req,res) => {
+//   res.sendFile(__dirname + '/index.html')
+// })
+
+app.use(express.static('public'));
 
 let connected = 0;
 
@@ -44,6 +46,10 @@ io.on('connection', (socket) => {
   socket.on('ORG HIDE', () => {
     io.emit('NODE HIDE');
   });
+
+  socket.on("ORG COFFEE", () => {
+    io.emit("NODE COFFEE");
+  })
 
   // In case of audience, event will be
   // AUD <USERNAME> <X> <OPTION>

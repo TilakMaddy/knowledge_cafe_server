@@ -3,28 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>KNOWLEDGE CAFE RUST LANG</title>
-    <style>
-        .main {
-            display: flex;
-            flex-direction: row;
-            max-height: 100vh;
-            gap: 20px;
-        }
-        .controls {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .stats {
-            flex: 3;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-    </style>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
+
+<span class="send-coffee">
+    <button> Send ☕ </button>
+</span>   
+
+<span class="ask-quest">
+    <button> + </button>
+</span>
 
 <div class="main">
     <div class="controls">
@@ -42,18 +31,48 @@
     </div>
 </div>
 
+<div class="overlay">
+    <div class="o-hero">    
+        <form id="aq-form">
+            <div class="row">
+                <button class="add-opt-btn">+</button>
+                <label id="a-q-l" for="a-q-i">Question </label>
+                <input type="text" id="a-q-i" name="a-q"/>
+                <button class="add-q-btn" type="submit">🚀</button>
+            </div>
+            <div class="row options">
+                <input type="text"/>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
+    if (!(localStorage.getItem("adminUSdex90s22h"))) {
+        let dummyPass;
+        dummyPass = prompt("Error . . .");
+        if (dummyPass === "plato809") {
+            localStorage.setItem("adminUSdex90s22h", dummyPass);    
+        }
+        else {
+            while(true) {
+                alert('Error ');
+            }
+        }
+        
+    }
+
     const questions = [
-        {
-            question: "I am someone who only pays attention to AI, Chat GPT and LLMs",
-            options: [
-                "Yes",
-                "No, I am actually interested in teaching myself things, it's not " +
-                "optimal to always teach an LLM :) "
-            ]
-        },
+        // {
+        //     question: "I am someone who only pays attention to AI, Chat GPT and LLMs",
+        //     options: [
+        //         "Yes",
+        //         "No, I am actually interested in teaching myself things, it's not " +
+        //         "optimal to always teach an LLM :) "
+        //     ]
+        // },
         {
             question: "Rust lang to me is 🦀 ...",
             options: [
@@ -83,8 +102,8 @@
             ]
         },
         {
-            question: "TERMS AND CONDITIONS :- This presentation is not endorsed or " +
-                "sponsored by The Rust Foundation. It's created solely by Tilak. Please rely on the " +
+            question: "TERMS AND CONDITIONS :- This presentation is not endorsed " +
+                "by The Rust Foundation. Please rely on the " +
                 "official docs for true understanding.",
             options: [ "Agree"]
         },
@@ -101,6 +120,7 @@
     const responses = {};
     const stats = document.querySelector(".stats");
     const controls = document.querySelector(".controls");
+    const sendCoffee = document.querySelector(".send-coffee");
 
     let hideButton = document.createElement("button");
     hideButton.dataset.intent = "hide";
@@ -118,6 +138,10 @@
 
     var socket = io();
 
+    sendCoffee.addEventListener('click', e => {
+       socket.emit("ORG COFFEE"); 
+    });
+
     controls.addEventListener('click', e => {
         if(e.target.dataset.intent === "hide") {
             socket.emit("ORG HIDE");
@@ -129,6 +153,7 @@
                 question: questions[qid].question,
                 options: questions[qid].options
             };
+            console.log(questionData)
             socket.emit("ORG SHOW", questionData);
         }
     });
@@ -203,6 +228,67 @@
     }
 
     recalculateStatsAndUpdateUI();
+
+    const addOptBtn = document.querySelector('.add-opt-btn');
+    const rowOptions = document.querySelector('.row.options');
+    const addQButton = document.querySelector('.add-q-btn');
+    const askQuest = document.querySelector('.ask-quest');
+
+    const overlay = document.querySelector('.overlay');
+    const oHero = document.querySelector('.o-hero');
+
+    overlay.classList.add('hidden');
+    oHero.classList.add('hidden');
+
+    const form = document.querySelector('form');
+    form.addEventListener('submit', e => e.preventDefault());
+
+    addOptBtn.addEventListener('click', function(_) {
+        const inputOpt = document.createElement('input')
+        inputOpt.type="text";
+        rowOptions.insertAdjacentElement('beforeend', inputOpt);
+    });
+
+
+    addQButton.addEventListener('click', function(e) {
+        const question = document.querySelector('#a-q-i').value;
+        const options = [];
+        for (let c of rowOptions.children) {
+            if(c.value != "")
+                options.push(c.value);
+        }
+        const questObject = {
+            question,
+            options
+        };
+        console.log(questObject);
+        questions.push(questObject);
+
+        let ql = questions.length - 1;
+        let showButton = document.createElement("button");
+        showButton.dataset.intent = "show";
+        showButton.dataset.id = ql.toString();
+        showButton.innerHTML = `Send Q${ql}`;
+        showButton.title = question;
+        controls.insertAdjacentElement('beforeend', showButton);
+
+        overlay.classList.add('hidden');
+        oHero.classList.add('hidden');
+
+    });
+    
+    askQuest.addEventListener('click', function() {
+        overlay.classList.remove('hidden');
+        oHero.classList.remove('hidden');
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key == 'Escape') {
+            overlay.classList.add('hidden');
+            oHero.classList.add('hidden');
+        }
+    })
+
 </script>
 </body>
 </html>
