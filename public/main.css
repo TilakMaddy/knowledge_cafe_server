@@ -21,6 +21,7 @@
 /*modal button*/
 
 .ask-quest {
+    display: inline-block;
     margin: 1rem;
     padding: 0.2rem;
 }

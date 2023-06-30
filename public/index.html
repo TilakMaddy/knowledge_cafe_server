@@ -7,9 +7,13 @@
 </head>
 <body>
 
-<div class="ask-quest">
+<span class="send-coffee">
+    <button> Send ☕ </button>
+</span>   
+
+<span class="ask-quest">
     <button> + </button>
-</div>
+</span>
 
 <div class="main">
     <div class="controls">
@@ -116,6 +120,7 @@
     const responses = {};
     const stats = document.querySelector(".stats");
     const controls = document.querySelector(".controls");
+    const sendCoffee = document.querySelector(".send-coffee");
 
     let hideButton = document.createElement("button");
     hideButton.dataset.intent = "hide";
@@ -132,6 +137,10 @@
     }
 
     var socket = io();
+
+    sendCoffee.addEventListener('click', e => {
+       socket.emit("ORG COFFEE"); 
+    });
 
     controls.addEventListener('click', e => {
         if(e.target.dataset.intent === "hide") {

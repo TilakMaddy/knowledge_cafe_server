@@ -47,6 +47,10 @@ io.on('connection', (socket) => {
     io.emit('NODE HIDE');
   });
 
+  socket.on("ORG COFFEE", () => {
+    io.emit("NODE COFFEE");
+  })
+
   // In case of audience, event will be
   // AUD <USERNAME> <X> <OPTION>
   //      -> Respond by emitting NODE ANS for organizer to listen
